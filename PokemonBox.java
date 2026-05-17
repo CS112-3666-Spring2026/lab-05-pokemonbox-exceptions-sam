@@ -10,8 +10,7 @@ public class PokemonBox {
 	// CONSTRUCTORS
 	public PokemonBox(Pokemon[] caught) {
 		if(caught == null || caught.length == 0) {
-			System.out.println("ERROR: Invalid Pokemon array provided to PokemonBox. Exiting program.");
-			System.exit(0);
+			throw new IllegalArgumentException("ERROR: Invalid Pokemon array provided to PokemonBox.");
 		}
 		this.numCaught = caught.length;
 		this.caught = this.deepCopyArray(caught, this.numCaught*2);
@@ -38,8 +37,11 @@ public class PokemonBox {
 		}
 		return location;
 	}
-
-	public Pokemon getPokemon(int location) {
+// Upgrade getPokemon method to throw IndexOutOfBoundsException for illegal location value
+public Pokemon getPokemon(int location) {
+	if (location < 0) {
+		throw new IndexOutOfBoundsException("ERROR: location value is out of bounds");
+		}
 		return this.caught[location];
 	}
 
@@ -55,8 +57,9 @@ public class PokemonBox {
 		return this.getLocation(pokemonName) != -1;
 	}
 
+// Upgrade add method to throw PokemonAlreadyExistsException when the name of the provided Pokemon already exists in the array
 	// MUTATOR/SETTER METHODS
-	public void add(Pokemon newPoke) {
+	public void add (Pokemon newPoke) throws PokemonAlreadyExistsException {
 		//new pokemon,  add to partially filled array
 		//but first check if box is full
 		if(this.numCaught == this.caught.length) {
@@ -64,9 +67,15 @@ public class PokemonBox {
 			this.caught = this.deepCopyArray(this.caught, this.numCaught*2);
 		}
 
-		//then add new caught pokemon
+		for (int i = 0; i < this.numCaught; i++) {
+			if (this.caught[i].getName().equals(newPoke.getName())) {
+				System.out.println("caught:  " + this.caught[i].getName() + "\nNew Pokemon:  " + newPoke.getName());
+				throw new PokemonAlreadyExistsException("ERROR: Already a pokemon of the same name in box.");
+			}
+		} //then add new caught pokemon
 		this.caught[this.numCaught] = new Pokemon(newPoke);
 		this.numCaught++;
+		
 	}
 	
 	// OTHER REQUIRED METHODS
@@ -94,3 +103,8 @@ public class PokemonBox {
 		return deepCopy;
 	}
 }
+
+
+
+
+
